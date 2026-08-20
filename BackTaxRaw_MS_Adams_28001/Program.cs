@@ -428,7 +428,7 @@ VALUES
             string GetTaxInformationValue(string label)
             {
                 HtmlNode labelCell = taxInformationTable.SelectSingleNode(
-                    $".//td[normalize-space(translate(., '{lowercaseLetters}:', '{uppercaseLetters}'))='{label}']"
+                    $".//td[.//b[normalize-space(translate(., '{lowercaseLetters}', '{uppercaseLetters}'))='{label}']]"
                 ) ?? throw new Exception($"{label} was not found in the TAX INFORMATION table.");
 
                 HtmlNode valueCell = labelCell.SelectSingleNode("following-sibling::td[1]")
@@ -468,7 +468,7 @@ VALUES
             string GetMiscellaneousInformationValue(string label)
             {
                 HtmlNode labelCell = miscellaneousInformationTable.SelectSingleNode(
-                    $".//td[normalize-space(translate(., '{lowercaseLetters}:', '{uppercaseLetters}'))='{label}']"
+                    $".//td[.//b[normalize-space(translate(., '{lowercaseLetters}', '{uppercaseLetters}'))='{label}']]"
                 ) ?? throw new Exception($"{label} was not found in the MISCELLANEOUS INFORMATION table.");
 
                 HtmlNode? valueCell = labelCell.SelectSingleNode("following-sibling::td[1]");
@@ -487,7 +487,7 @@ VALUES
             }
 
             HtmlNode legalLabelCell = miscellaneousInformationTable.SelectSingleNode(
-                $".//td[normalize-space(translate(., '{lowercaseLetters}:', '{uppercaseLetters}'))='LEGAL']"
+                $".//td[.//b[normalize-space(translate(., '{lowercaseLetters}', '{uppercaseLetters}'))='LEGAL']]"
             ) ?? throw new Exception("LEGAL was not found in the MISCELLANEOUS INFORMATION table.");
 
             HtmlNode legalRow = legalLabelCell.SelectSingleNode("ancestor::tr[1]")
