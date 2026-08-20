@@ -31,6 +31,8 @@ namespace BackTaxRaw_MS_Adams_28001
 
             IWebDriver driver = new ChromeDriver(options);
             driver = OpenUrl(driver);
+
+            IterateLiens(driver, liens);
         }
 
         private static IWebDriver OpenUrl(IWebDriver driver)
