@@ -55,7 +55,8 @@ namespace BackTaxRaw_MS_Adams_28001
             {
                 try
                 {
-                     Scrape(driver, lien);
+                    LienResult result = Scrape(driver, lien);
+                    Console.WriteLine($"PPIN {result.Lien.AdvNum}: PARCEL {result.PARCEL}");
                     driver = OpenUrl(driver);
                 }
                 catch (Exception ex)
@@ -107,7 +108,7 @@ namespace BackTaxRaw_MS_Adams_28001
 
      
 
-        private static void Scrape(IWebDriver driver, Lien lien)
+        private static LienResult Scrape(IWebDriver driver, Lien lien)
         {
             IWebElement ppin =
                 driver.FindElement(By.Name("HTMPPIN"));
@@ -138,7 +139,15 @@ namespace BackTaxRaw_MS_Adams_28001
             Thread.Sleep(2000);
 
 
+            IWebElement parcelValue = driver.FindElement(
+       By.XPath("//td[normalize-space(.)='PARCEL']/following-sibling::td[1]")
+   );
 
+            return new LienResult
+            {
+                Lien = lien,
+                PARCEL = parcelValue.Text.Trim()
+            };
 
 
         }
