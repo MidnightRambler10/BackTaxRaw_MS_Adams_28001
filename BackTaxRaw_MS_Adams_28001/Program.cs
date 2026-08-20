@@ -101,6 +101,8 @@ namespace BackTaxRaw_MS_Adams_28001
                     body.ToString()
                 );
             }
+
+            driver.Quit();
         }
 
      
@@ -137,6 +139,8 @@ namespace BackTaxRaw_MS_Adams_28001
 
 
 
+
+
         }
 
           
@@ -148,7 +152,7 @@ namespace BackTaxRaw_MS_Adams_28001
                 "Server=DataServer;Database=ContentGrabber;Trusted_Connection=True;TrustServerCertificate=True;";
 
             const string query = @"
-SELECT top 5
+SELECT top 3
     TaxLienID,
     TaxLienAPN,
     AdvertisementNumber,
