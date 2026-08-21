@@ -126,7 +126,7 @@ namespace BackTaxRaw_MS_Adams_28001
 
             submitButton.Click();
 
-            Thread.Sleep(3000);
+            Thread.Sleep(500);
 
             IReadOnlyCollection<IWebElement> ppinLinks =
                 driver.FindElements(
@@ -145,7 +145,7 @@ namespace BackTaxRaw_MS_Adams_28001
 
             ppinLinks.First().Click();
 
-            Thread.Sleep(2000);
+            Thread.Sleep(800);
 
             string? GetValue(string label)
             {
