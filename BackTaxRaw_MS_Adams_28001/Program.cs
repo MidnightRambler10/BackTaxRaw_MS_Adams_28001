@@ -47,52 +47,20 @@ namespace BackTaxRaw_MS_Adams_28001
 
         private static void IterateLiens(IWebDriver driver, List<Lien> liens)
         {
+            List<LienResult> successfulLiens =
+                new List<LienResult>();
+
             List<(Lien Lien, string ErrorMessage, DateTime ErrorDateTime)> errorList =
                 new List<(Lien Lien, string ErrorMessage, DateTime ErrorDateTime)>();
-           
 
             foreach (Lien lien in liens)
             {
                 try
                 {
                     LienResult result = Scrape(driver, lien);
-                    Console.WriteLine(
-     $"PPIN {result.Lien.AdvNum}, " +
-     $"PARCEL {result.PARCEL}, " +
-     $"ADDRESS {result.ADDRESS}, " +
-     $"OWNER {result.OWNER}, " +
-     $"ACRES {result.ACRES}, " +
-     $"LAND VALUE {result.LAND_VALUE}, " +
-     $"IMPROVEMENTS {result.IMPROVEMENTS}, " +
-     $"TOTAL VALUE {result.TOTAL_VALUE}, " +
-     $"ASSESSED {result.ASSESSED}, " +
-     $"PPIN VALUE {result.PPIN}, " +
-     $"TOWNSHIP {result.TOWNSHIP}, " +
-     $"LEGAL {result.LEGAL}, " +
-     $"TAX DISTRICT {result.TAX_DISTRICT}, " +
-     $"SECTION {result.SECTION}, " +
-     $"RANGE {result.RANGE}, " +
-     $"TAX YEAR {result.TAX_YEAR}, " +
-     $"RECORDS LAST UPDATED {result.RECORDS_LAST_UPDATED}, " +
-     $"EXEMPT CODE {result.EXEMPT_CODE}, " +
-     $"HOMESTEAD CODE {result.HOMESTEAD_CODE}, " +
-     $"BOOK {result.BOOK}, " +
-     $"PAGE {result.PAGE}, " +
-     $"TAX INFO YEAR {result.TAX_INFORMATION?.YEAR}, " +
-     $"COUNTY TAX DUE {result.TAX_INFORMATION?.COUNTY_TAX_DUE}, " +
-     $"COUNTY PAID {result.TAX_INFORMATION?.COUNTY_PAID}, " +
-     $"COUNTY BALANCE {result.TAX_INFORMATION?.COUNTY_BALANCE}, " +
-     $"CITY TAX DUE {result.TAX_INFORMATION?.CITY_TAX_DUE}, " +
-     $"CITY PAID {result.TAX_INFORMATION?.CITY_PAID}, " +
-     $"CITY BALANCE {result.TAX_INFORMATION?.CITY_BALANCE}, " +
-     $"SCHOOL TAX DUE {result.TAX_INFORMATION?.SCHOOL_TAX_DUE}, " +
-     $"SCHOOL PAID {result.TAX_INFORMATION?.SCHOOL_PAID}, " +
-     $"SCHOOL BALANCE {result.TAX_INFORMATION?.SCHOOL_BALANCE}, " +
-     $"TOTAL TAX DUE {result.TAX_INFORMATION?.TOTAL_TAX_DUE}, " +
-     $"TOTAL PAID {result.TAX_INFORMATION?.TOTAL_PAID}, " +
-     $"TOTAL BALANCE {result.TAX_INFORMATION?.TOTAL_BALANCE}, " +
-     $"LAST PAYMENT DATE {result.TAX_INFORMATION?.LAST_PAYMENT_DATE}"
- );
+
+                    successfulLiens.Add(result);
+
                     driver = OpenUrl(driver);
                 }
                 catch (Exception ex)
