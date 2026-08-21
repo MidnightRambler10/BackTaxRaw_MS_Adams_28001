@@ -210,9 +210,10 @@ namespace BackTaxRaw_MS_Adams_28001
                     .Text
                     .Trim();
 
-                recordsLastUpdated = string.IsNullOrWhiteSpace(value)
-                    ? null
-                    : value;
+                recordsLastUpdated =
+                    string.IsNullOrWhiteSpace(value)
+                        ? null
+                        : value;
             }
 
             IWebElement? taxInformationTable = null;
@@ -491,9 +492,7 @@ namespace BackTaxRaw_MS_Adams_28001
                     }
 
                     IReadOnlyCollection<IWebElement> cells =
-                        row.FindElements(
-                            By.XPath("./td")
-                        );
+                        row.FindElements(By.XPath("./td"));
 
                     if (cells.Count < 4)
                     {
@@ -520,6 +519,85 @@ namespace BackTaxRaw_MS_Adams_28001
                     " ",
                     legalParts
                 );
+            }
+
+            string? GetTaxSaleHistoryJson()
+            {
+                IReadOnlyCollection<IWebElement> historyTables =
+                    driver.FindElements(
+                        By.XPath(
+                            "//tr[td//b[normalize-space(.)='TAX SALES HISTORY, FOR UNPAID TAXES']]" +
+                            "/ancestor::table[1]"
+                        )
+                    );
+
+                if (historyTables.Count == 0)
+                {
+                    return null;
+                }
+
+                IWebElement historyTable =
+                    historyTables.First();
+
+                IReadOnlyCollection<IWebElement> rows =
+                    historyTable.FindElements(
+                        By.XPath(
+                            ".//tr[" +
+                            "td[1][normalize-space(.) != ''] and " +
+                            "td[2][normalize-space(.) != ''] and " +
+                            "not(td[1]//u) and " +
+                            "not(td//b[normalize-space(.)='TAX SALES HISTORY, FOR UNPAID TAXES'])" +
+                            "]"
+                        )
+                    );
+
+                List<object> history =
+                    new List<object>();
+
+                foreach (IWebElement row in rows)
+                {
+                    IReadOnlyCollection<IWebElement> cells =
+                        row.FindElements(By.XPath("./td"));
+
+                    if (cells.Count < 4)
+                    {
+                        continue;
+                    }
+
+                    string year =
+                        cells.ElementAt(0).Text.Trim();
+
+                    string soldTo =
+                        cells.ElementAt(1).Text.Trim();
+
+                    string redeemedDateBy =
+                        cells.ElementAt(3).Text.Trim();
+
+                    if (string.IsNullOrWhiteSpace(year))
+                    {
+                        continue;
+                    }
+
+                    history.Add(
+                        new
+                        {
+                            Year = year,
+                            SoldTo = string.IsNullOrWhiteSpace(soldTo)
+                                ? null
+                                : soldTo,
+                            RedeemedDateBy = string.IsNullOrWhiteSpace(redeemedDateBy)
+                                ? null
+                                : redeemedDateBy
+                        }
+                    );
+                }
+
+                if (history.Count == 0)
+                {
+                    return null;
+                }
+
+                return JsonSerializer.Serialize(history);
             }
 
             TaxInformation taxInformation =
@@ -634,7 +712,10 @@ namespace BackTaxRaw_MS_Adams_28001
                     GetBookPageValue("Page"),
 
                 TAX_INFORMATION =
-                    taxInformation
+                    taxInformation,
+
+                TAX_SALE_HISTORY_JSON =
+                    GetTaxSaleHistoryJson()
             };
         }
 

@@ -31,5 +31,8 @@ namespace BackTaxRaw_MS_Adams_28001
         public string? PAGE { get; set; }
 
         public TaxInformation? TAX_INFORMATION { get; set; }
+
+
+        public string? TAX_SALE_HISTORY_JSON { get; set; }
     }
 }
