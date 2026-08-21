@@ -647,9 +647,9 @@ namespace BackTaxRaw_MS_Adams_28001
                 "Server=DataServer;Database=ContentGrabber;Trusted_Connection=True;TrustServerCertificate=True;";
 
             const string recreateTableQuery = @"
-                DROP TABLE IF EXISTS dbo.SuccessfulLiens;
+                DROP TABLE IF EXISTS dbo.BackTaxRaw_MS_Adams_28001;
 
-                CREATE TABLE dbo.SuccessfulLiens
+                CREATE TABLE dbo.BackTaxRaw_MS_Adams_28001
                 (
                     TaxLienID           NVARCHAR(255) NULL,
                     APN                 NVARCHAR(255) NULL,
@@ -694,7 +694,7 @@ namespace BackTaxRaw_MS_Adams_28001
                 );";
 
             const string insertQuery = @"
-                INSERT INTO dbo.SuccessfulLiens
+                INSERT INTO dbo.BackTaxRaw_MS_Adams_28001
                 (
                     TaxLienID, APN, AdvertisementNumber, ParcelID, AuctionYear,
                     DelinquentYear, PARCEL, ADDRESS, OWNER, ACRES, LAND_VALUE,
