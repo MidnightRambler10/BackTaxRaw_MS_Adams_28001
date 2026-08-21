@@ -771,7 +771,8 @@ namespace BackTaxRaw_MS_Adams_28001
                     TOTAL_TAX_DUE       NVARCHAR(MAX) NULL,
                     TOTAL_PAID          NVARCHAR(MAX) NULL,
                     TOTAL_BALANCE       NVARCHAR(MAX) NULL,
-                    LAST_PAYMENT_DATE   NVARCHAR(MAX) NULL
+                    LAST_PAYMENT_DATE   NVARCHAR(MAX) NULL,
+                    TAX_SALE_HISTORY_JSON NVARCHAR(MAX) NULL
                 );";
 
             const string insertQuery = @"
@@ -785,7 +786,7 @@ namespace BackTaxRaw_MS_Adams_28001
                     COUNTY_TAX_DUE, COUNTY_PAID, COUNTY_BALANCE, CITY_TAX_DUE,
                     CITY_PAID, CITY_BALANCE, SCHOOL_TAX_DUE, SCHOOL_PAID,
                     SCHOOL_BALANCE, TOTAL_TAX_DUE, TOTAL_PAID, TOTAL_BALANCE,
-                    LAST_PAYMENT_DATE
+                    LAST_PAYMENT_DATE, TAX_SALE_HISTORY_JSON
                 )
                 VALUES
                 (
@@ -797,7 +798,7 @@ namespace BackTaxRaw_MS_Adams_28001
                     @COUNTY_TAX_DUE, @COUNTY_PAID, @COUNTY_BALANCE, @CITY_TAX_DUE,
                     @CITY_PAID, @CITY_BALANCE, @SCHOOL_TAX_DUE, @SCHOOL_PAID,
                     @SCHOOL_BALANCE, @TOTAL_TAX_DUE, @TOTAL_PAID, @TOTAL_BALANCE,
-                    @LAST_PAYMENT_DATE
+                    @LAST_PAYMENT_DATE, @TAX_SALE_HISTORY_JSON
                 );";
 
             using SqlConnection connection = new SqlConnection(connectionString);
@@ -864,6 +865,7 @@ namespace BackTaxRaw_MS_Adams_28001
                     AddValue("@TOTAL_PAID", result.TAX_INFORMATION?.TOTAL_PAID);
                     AddValue("@TOTAL_BALANCE", result.TAX_INFORMATION?.TOTAL_BALANCE);
                     AddValue("@LAST_PAYMENT_DATE", result.TAX_INFORMATION?.LAST_PAYMENT_DATE);
+                    AddValue("@TAX_SALE_HISTORY_JSON", result.TAX_SALE_HISTORY_JSON);
 
                     insertCommand.ExecuteNonQuery();
                 }
