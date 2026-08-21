@@ -191,9 +191,10 @@ namespace BackTaxRaw_MS_Adams_28001
                     .Replace("Tax Year", string.Empty)
                     .Trim();
 
-                taxYear = string.IsNullOrWhiteSpace(value)
-                    ? null
-                    : value;
+                taxYear =
+                    string.IsNullOrWhiteSpace(value)
+                        ? null
+                        : value;
             }
 
             IReadOnlyCollection<IWebElement> recordsUpdatedElements =
@@ -523,41 +524,40 @@ namespace BackTaxRaw_MS_Adams_28001
 
             string? GetTaxSaleHistoryJson()
             {
-                IReadOnlyCollection<IWebElement> historyTables =
+                IReadOnlyCollection<IWebElement> historyHeaderRows =
                     driver.FindElements(
                         By.XPath(
-                            "//tr[td//b[normalize-space(.)='TAX SALES HISTORY, FOR UNPAID TAXES']]" +
-                            "/ancestor::table[1]"
+                            "//tr[" +
+                            "count(td)=1 and " +
+                            "td[@colspan='4']//b[" +
+                            "normalize-space(.)='TAX SALES HISTORY, FOR UNPAID TAXES'" +
+                            "]" +
+                            "]"
                         )
                     );
 
-                if (historyTables.Count == 0)
+                if (historyHeaderRows.Count == 0)
                 {
                     return null;
                 }
 
-                IWebElement historyTable =
-                    historyTables.First();
+                IWebElement historyHeaderRow =
+                    historyHeaderRows.First();
 
-                IReadOnlyCollection<IWebElement> rows =
-                    historyTable.FindElements(
-                        By.XPath(
-                            ".//tr[" +
-                            "td[1][normalize-space(.) != ''] and " +
-                            "td[2][normalize-space(.) != ''] and " +
-                            "not(td[1]//u) and " +
-                            "not(td//b[normalize-space(.)='TAX SALES HISTORY, FOR UNPAID TAXES'])" +
-                            "]"
-                        )
+                IReadOnlyCollection<IWebElement> historyRows =
+                    historyHeaderRow.FindElements(
+                        By.XPath("./following-sibling::tr")
                     );
 
                 List<object> history =
                     new List<object>();
 
-                foreach (IWebElement row in rows)
+                foreach (IWebElement row in historyRows)
                 {
                     IReadOnlyCollection<IWebElement> cells =
-                        row.FindElements(By.XPath("./td"));
+                        row.FindElements(
+                            By.XPath("./td")
+                        );
 
                     if (cells.Count < 4)
                     {
@@ -565,29 +565,39 @@ namespace BackTaxRaw_MS_Adams_28001
                     }
 
                     string year =
-                        cells.ElementAt(0).Text.Trim();
+                        cells.ElementAt(0)
+                            .Text
+                            .Trim();
 
-                    string soldTo =
-                        cells.ElementAt(1).Text.Trim();
-
-                    string redeemedDateBy =
-                        cells.ElementAt(3).Text.Trim();
-
-                    if (string.IsNullOrWhiteSpace(year))
+                    if (!int.TryParse(year, out _))
                     {
                         continue;
                     }
+
+                    string soldTo =
+                        cells.ElementAt(1)
+                            .Text
+                            .Trim();
+
+                    string redeemedDateBy =
+                        cells.ElementAt(3)
+                            .Text
+                            .Trim();
 
                     history.Add(
                         new
                         {
                             Year = year,
-                            SoldTo = string.IsNullOrWhiteSpace(soldTo)
-                                ? null
-                                : soldTo,
-                            RedeemedDateBy = string.IsNullOrWhiteSpace(redeemedDateBy)
-                                ? null
-                                : redeemedDateBy
+
+                            SoldTo =
+                                string.IsNullOrWhiteSpace(soldTo)
+                                    ? null
+                                    : soldTo,
+
+                            RedeemedDateBy =
+                                string.IsNullOrWhiteSpace(redeemedDateBy)
+                                    ? null
+                                    : redeemedDateBy
                         }
                     );
                 }
@@ -599,7 +609,6 @@ namespace BackTaxRaw_MS_Adams_28001
 
                 return JsonSerializer.Serialize(history);
             }
-
             TaxInformation taxInformation =
                 new TaxInformation
                 {
@@ -888,7 +897,7 @@ namespace BackTaxRaw_MS_Adams_28001
                 "Server=DataServer;Database=ContentGrabber;Trusted_Connection=True;TrustServerCertificate=True;";
 
             const string query = @"
-                                    SELECT top 3
+                                    SELECT 
                                         TaxLienID,
                                         TaxLienAPN,
                                         AdvertisementNumber,
