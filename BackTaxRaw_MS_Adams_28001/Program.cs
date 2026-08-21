@@ -114,7 +114,7 @@ namespace BackTaxRaw_MS_Adams_28001
             driver.Quit();
         }
 
-     
+
 
         private static LienResult Scrape(IWebDriver driver, Lien lien)
         {
@@ -146,106 +146,85 @@ namespace BackTaxRaw_MS_Adams_28001
 
             Thread.Sleep(2000);
 
-            IWebElement parcelValue = driver.FindElement(
-                By.XPath("//td[normalize-space(.)='PARCEL']/following-sibling::td[1]")
-            );
-
-            IWebElement addressValue = driver.FindElement(
-                By.XPath("//td[normalize-space(.)='ADDRESS']/following-sibling::td[1]")
-            );
-
-            IWebElement ownerValue = driver.FindElement(
-                By.XPath("//td[normalize-space(.)='OWNER']/following-sibling::td[1]")
-            );
-
-            IWebElement acresValue = driver.FindElement(
-                By.XPath("//td[normalize-space(.)='ACRES']/following-sibling::td[1]")
-            );
-
-            IWebElement landValue = driver.FindElement(
-                By.XPath("//td[normalize-space(.)='LAND VALUE']/following-sibling::td[1]")
-            );
-
-            IWebElement improvementsValue = driver.FindElement(
-                By.XPath("//td[normalize-space(.)='IMPROVEMENTS']/following-sibling::td[1]")
-            );
-
-            IWebElement totalValue = driver.FindElement(
-                By.XPath("//td[normalize-space(.)='TOTAL VALUE']/following-sibling::td[1]")
-            );
-
-            IWebElement assessedValue = driver.FindElement(
-                By.XPath("//td[normalize-space(.)='ASSESSED']/following-sibling::td[1]")
-            );
-
-            IWebElement ppinValue = driver.FindElement(
-                By.XPath("//td[normalize-space(.)='PPIN']/following-sibling::td[1]")
-            );
-
-            IWebElement townshipValue = driver.FindElement(
-                By.XPath("//td[normalize-space(.)='TOWNSHIP']/following-sibling::td[1]")
-            );
-
-            IWebElement legalValue = driver.FindElement(
-                By.XPath("//td[normalize-space(.)='LEGAL']/following-sibling::td[1]")
-            );
-
-            IWebElement taxDistrictValue = driver.FindElement(
-                By.XPath("//td[normalize-space(.)='TAX DISTRICT']/following-sibling::td[1]")
-            );
-
-            IWebElement sectionValue = driver.FindElement(
-                By.XPath("//td[normalize-space(.)='SECTION']/following-sibling::td[1]")
-            );
-
-            IWebElement rangeValue = driver.FindElement(
-                By.XPath("//td[normalize-space(.)='RANGE']/following-sibling::td[1]")
-            );
-
-            IWebElement taxYearCell = driver.FindElement(
-                By.XPath("//td[.//b[contains(normalize-space(.), 'Tax Year')]]")
-            );
-
-            IReadOnlyCollection<IWebElement> taxYearDetails =
-                taxYearCell.FindElements(By.TagName("b"));
-
-            if (taxYearDetails.Count < 2)
+            string? GetValue(string label)
             {
-                throw new Exception(
-                    $"Tax Year or Records Last Updated was not found for PPIN {lien.AdvNum}."
-                );
+                IReadOnlyCollection<IWebElement> elements =
+                    driver.FindElements(
+                        By.XPath($"//td[normalize-space(.)='{label}']/following-sibling::td[1]")
+                    );
+
+                if (elements.Count == 0)
+                {
+                    return null;
+                }
+
+                string value = elements.First().Text.Trim();
+
+                return string.IsNullOrWhiteSpace(value)
+                    ? null
+                    : value;
             }
 
-            string taxYear = taxYearDetails.ElementAt(0).Text
-                .Replace("Tax Year", string.Empty)
-                .Trim();
+            string? taxYear = null;
+            string? recordsLastUpdated = null;
 
-            string recordsLastUpdated = taxYearDetails.ElementAt(1).Text.Trim();
+            IReadOnlyCollection<IWebElement> taxYearCells =
+                driver.FindElements(
+                    By.XPath("//td[.//b[contains(normalize-space(.), 'Tax Year')]]")
+                );
+
+            if (taxYearCells.Count > 0)
+            {
+                IReadOnlyCollection<IWebElement> taxYearDetails =
+                    taxYearCells.First().FindElements(By.TagName("b"));
+
+                if (taxYearDetails.Count > 0)
+                {
+                    string value = taxYearDetails.ElementAt(0).Text
+                        .Replace("Tax Year", string.Empty)
+                        .Trim();
+
+                    taxYear = string.IsNullOrWhiteSpace(value)
+                        ? null
+                        : value;
+                }
+
+                if (taxYearDetails.Count > 1)
+                {
+                    string value =
+                        taxYearDetails.ElementAt(1).Text.Trim();
+
+                    recordsLastUpdated =
+                        string.IsNullOrWhiteSpace(value)
+                            ? null
+                            : value;
+                }
+            }
 
             return new LienResult
             {
                 Lien = lien,
-                PARCEL = parcelValue.Text.Trim(),
-                ADDRESS = addressValue.Text.Trim(),
-                OWNER = ownerValue.Text.Trim(),
-                ACRES = acresValue.Text.Trim(),
-                LAND_VALUE = landValue.Text.Trim(),
-                IMPROVEMENTS = improvementsValue.Text.Trim(),
-                TOTAL_VALUE = totalValue.Text.Trim(),
-                ASSESSED = assessedValue.Text.Trim(),
-                PPIN = ppinValue.Text.Trim(),
-                TOWNSHIP = townshipValue.Text.Trim(),
-                LEGAL = legalValue.Text.Trim(),
-                TAX_DISTRICT = taxDistrictValue.Text.Trim(),
-                SECTION = sectionValue.Text.Trim(),
-                RANGE = rangeValue.Text.Trim(),
+                PARCEL = GetValue("PARCEL"),
+                ADDRESS = GetValue("ADDRESS"),
+                OWNER = GetValue("OWNER"),
+                ACRES = GetValue("ACRES"),
+                LAND_VALUE = GetValue("LAND VALUE"),
+                IMPROVEMENTS = GetValue("IMPROVEMENTS"),
+                TOTAL_VALUE = GetValue("TOTAL VALUE"),
+                ASSESSED = GetValue("ASSESSED"),
+                PPIN = GetValue("PPIN"),
+                TOWNSHIP = GetValue("TOWNSHIP"),
+                LEGAL = GetValue("LEGAL"),
+                TAX_DISTRICT = GetValue("TAX DISTRICT"),
+                SECTION = GetValue("SECTION"),
+                RANGE = GetValue("RANGE"),
                 TAX_YEAR = taxYear,
                 RECORDS_LAST_UPDATED = recordsLastUpdated
             };
         }
 
-          
-       
+
+
 
         private static List<Lien> LoadLiens()
         {
@@ -315,8 +294,9 @@ WHERE TaxLienStatus = 'OPEN'
             smtp.UseDefaultCredentials = false;
             smtp.Credentials = new NetworkCredential(
                 "abshir.saleem@lumentumllc.com",
-                Environment.GetEnvironmentVariable("SMTP_PASSWORD")
-                    ?? throw new InvalidOperationException("SMTP_PASSWORD environment variable is not set.")
+                "@B10tx2025"
+                   
+
             );
             smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
 
